@@ -8,7 +8,7 @@ class MacroFunctions:
         self.output_path = output_path
         self.threshold_min = int(threshold_min)
         self.threshold_max = int(threshold_max)
-        self.scale = int(scale)
+        self.scale = float(scale)
         self.unit  = unit
         self.save_type = save_type
 
@@ -52,5 +52,3 @@ class MacroFunctions:
     def save_type(save_type, results_path):
         ''' function to save results or preprocessed image'''
         save_as = f'''saveAs("{save_type}", "{results_path}");'''
-
-

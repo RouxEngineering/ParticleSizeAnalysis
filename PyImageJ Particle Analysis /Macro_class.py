@@ -1,7 +1,7 @@
 # creating macro class functions to be called 
 
 class MacroFunctions:
-    def __init__(self, image_path, results_path, output_path, threshold_min, threshold_max, scale, unit, save_type):
+    def __init__(self, image_path, results_path, output_path, threshold_min, threshold_max, scale, unit, save_type, pixels):
         #initalize variables 
         self.image_path = image_path
         self.results_path = results_path
@@ -11,6 +11,7 @@ class MacroFunctions:
         self.scale = float(scale)
         self.unit  = unit
         self.save_type = save_type
+        self.pixels = int(pixels)
 
     def open_image(image_path): 
         '''macro function to open image based on image file path'''
@@ -26,24 +27,31 @@ class MacroFunctions:
     
     def set_threshold(threshold_min, threshold_max):
         '''macro function to set image threshold and invert image'''
-        macro_threshold = f'''setThreshold({threshold_min}, {threshold_max}); 
-        run("Invert");'''
+        macro_threshold = f'''setThreshold({threshold_min}, {threshold_max});'''
 
         return macro_threshold
     
     def binary_mask():
         '''macro function to apply binary mask onto image'''
-        binary_mask = f'''run("Convert to Mask");'''
+        binary_mask = f'''
+        run("Invert");
+        run("Convert to Mask");'''
 
         return binary_mask
     
-    def set_scale(scale, unit): 
+    def set_scale(scale, unit, pixels): 
         '''macro function to implement scale and units'''
-        set_scale = f'''run("Set Scale...", "known=100 unit=um");'''
+        set_scale = f'''run("Set Scale...", "distance={pixels}, known={scale} unit={unit}");'''
 
         return set_scale
     
-    def analyze_particles ():
+    def set_measurements():
+        '''macro function to set the measurements for analyzing particles'''
+        set_measurements = f'''run("Set Measurements...", "area mean standard min centroid perimeter bounding box fit shape feret's integrated density median skewness kurtosis area_fraction stack position");'''
+        
+        return set_measurements
+    
+    def analyze_particles():
         '''macro function to analyze particles'''
         analyze_particles = f'''run("Analyze Particles...","size=0-Infinity");'''
 

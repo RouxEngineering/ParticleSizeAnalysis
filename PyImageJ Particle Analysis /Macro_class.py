@@ -2,7 +2,7 @@
 Macro functions to be called in PyImageJ
 '''
 class MacroFunctions:
-    def __init__(self, image_path, results_path, output_path, threshold_min=None, threshold_max=None, scale=None, unit=None, pixels=None):
+    def __init__(self, image_path=None, results_path=None, output_path=None, threshold_min=None, threshold_max=None, scale=None, unit=None, pixels=None):
         #initalize variables 
         self.image_path = image_path
         self.results_path = results_path

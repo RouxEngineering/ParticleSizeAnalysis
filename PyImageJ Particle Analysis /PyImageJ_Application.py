@@ -5,31 +5,86 @@ import imagej
 from imagej import Mode
 from Macro_Class import MacroFunctions
 from PyimageJ_Class import PyImageJApp
+import os
+from os import listdir
+
+
+def read_imagefiles(image_directory):
+    '''function to iteratively get the paths for every image in the the particle image path retuns list of image paths to be opened
+    args:
+    image_directory = folder path for images
+    
+    return:
+    list_of_imagepaths = list of image paths for each image in folder'''
+    
+    list_of_imagepaths = []
+
+    # iterate over image_directory
+    for image in os.listdir(image_directory):
+        list_of_imagepaths.append(image)
+
+    return list_of_imagepaths
+
 
 
 
 def main():
 
-    # initalize imagej
+    # initalize image
     ij = imagej.init('net.imagej:imagej+net.imagej:imagej-legacy', mode=Mode.HEADLESS)
 
-    
-    macro_funcs = MacroFunctions(
-    image_path='/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Particle Images/Ti64_Lot232-EZ2316_1Use_10X_Scale.png',
-    results_path='/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Results/results_summary.csv',
-    output_path='/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Images/processed_img.png',
-    )
+    # initialize application
+    app = PyImageJApp()
 
-    app = PyImageJApp(macro_funcs)
-    macro = app.running_macros()
-    
-    ij.py.run_macro(macro)
+    # set directories
+    image_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Particle Images/'
+    results_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Results/'
+    output_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Images/'
+
+    list_of_imagepaths = read_imagefiles(image_directory)
+
+    if list_of_imagepaths:
+        
+        # initialize threshold and scale using first image 
+            first_image_path = list_of_imagepaths[0]
+            absolute_image_path = image_directory + first_image_path 
+            absolute_results_path = os.path.splitext(results_directory + first_image_path )[0]+'_results.csv'
+            absolute_output_path = os.path.splitext(output_directory + first_image_path )[0]+'_processedimage.png'
+
+            app.macro_functions = MacroFunctions(
+            image_path=absolute_image_path,
+            results_path=absolute_results_path,
+            output_path=absolute_output_path,
+            )
+            # prompt user for operation inputs 
+            operations = app.prompt_user()
+
+            # set scale and threshold if requested
+            app.initialize_threshold_scale(operations)
+            
+            # apply macro to every single image in folder
+            for image_path in list_of_imagepaths:
+                absolute_image_path = os.path.join(image_directory, image_path)
+                absolute_results_path = os.path.splitext(os.path.join(results_directory, image_path))[0] + '_results.csv'
+                absolute_output_path = os.path.splitext(os.path.join(output_directory, image_path))[0] + '_processedimage.png'
+
+                app.macro_functions = MacroFunctions(
+                    image_path=absolute_image_path,
+                    results_path=absolute_results_path,
+                    output_path=absolute_output_path,
+                    threshold_min=app.macro_functions.threshold_min,
+                    threshold_max=app.macro_functions.threshold_max,
+                    scale=app.macro_functions.scale,
+                    unit=app.macro_functions.unit,
+                    pixels=app.macro_functions.pixels
+                )
+
+                macro = app.running_macros(operations)
+                ij.py.run_macro(macro)
 
 
-
-
-
-main()
+if __name__ == '__main__':
+    main()
 
 
 

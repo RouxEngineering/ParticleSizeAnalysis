@@ -8,8 +8,8 @@ from matplotlib.widgets import Slider
 import os
 
 class PyImageJApp:
-    def __init__(self, macro_functions):
-        self.macro_functions = macro_functions
+    def __init__(self):
+        self.macro_functions = None
 
     def get_scale(self): 
         '''function to open OpenCV GUI to allow user to set scale values for ImageJ'''
@@ -99,12 +99,24 @@ class PyImageJApp:
                 selected_operations.append(key)
 
         return selected_operations
-        
-    def running_macros(self):
+    
+    def initialize_threshold_scale(self, operations):
+        '''function to initalize threshold and scale values for one image'''
+
+        if 2 in operations: 
+            self.macro_functions.threshold_min = int(self.get_threshold())
+            self.macro_functions.threshold_max = 225 
+
+        if 4 in operations: 
+            self.macro_functions.pixels = int(self.get_scale())
+            self.macro_functions.scale = float(input('Input the known scale value:')) 
+            self.macro_functions.unit = input('Please enter the unit for the scale: ')
+
+        return operations
+
+
+    def running_macros(self, operations):
         '''function to create macros based on a list of returned operations'''
-        
-        # prompt user to get list of returned operations 
-        operations = self.prompt_user()
 
         # initialize operation commands to open image and iteratively add onto preprocessing and analysis 
         macro_cmd = [self.macro_functions.open_image()]
@@ -114,17 +126,12 @@ class PyImageJApp:
                 macro_cmd.append(self.macro_functions.set_8bit())
 
             elif operation == 2:
-                self.macro_functions.threshold_min = int(self.get_threshold())
-                self.macro_functions.threshold_max = 225 
                 macro_cmd.append(self.macro_functions.set_threshold())
 
             elif operation == 3: 
                 macro_cmd.append(self.macro_functions.binary_mask())
 
             elif operation == 4:
-                self.macro_functions.pixels = int(self.get_scale())
-                self.macro_functions.scale = float(input('Input the known scale value:')) 
-                self.macro_functions.unit = input('Please enter the unit for the scale: ')
                 macro_cmd.append(self.macro_functions.set_scale())
 
             elif operation == 5:

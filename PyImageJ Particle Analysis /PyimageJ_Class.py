@@ -6,6 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 import os
+import pandas as pd
 
 class PyImageJApp:
     def __init__(self):
@@ -114,6 +115,19 @@ class PyImageJApp:
 
         return operations
 
+    def analyze_particles_parameters(self, operations):
+        '''prompt user for parameters circularity min and max and size min and max'''
+        if 5 in operations:
+            self.macro_functions.particle_size_min = float(input("Please enter the min particle size value(Pixels^2):"))
+            max_particle_size_input = input("Please enter the max particle size value (Default value is Infinity): ")
+
+            # If no input is provided, use the default value (Infinity)
+            if max_particle_size_input == "":
+                self.macro_functions.particle_size_max = 'Infinity'
+            else:
+                self.macro_functions.particle_size_max = float(max_particle_size_input)
+            self.macro_functions.circularity_min = float(input("Please enter circularity min value:"))
+            self.macro_functions.circularity_max = float(input("Please enter circularity max value(limit:1.00)"))
 
     def running_macros(self, operations):
         '''function to create macros based on a list of returned operations'''
@@ -143,6 +157,46 @@ class PyImageJApp:
         # join script
         macro_script = "\n".join(macro_cmd)
         return macro_script
+    
+    def label_particles(self): 
+        '''create function to label particles on each image based on the x,y coordinates and update image'''
+
+        img = cv2.imread(self.macro_functions.output_path)
+
+        #create pandas df and iterativly label each particle 
+        particle_analysis_df = pd.read_csv(self.macro_functions.results_path)
+
+        # create list of tuples 
+        coordinates = particle_analysis_df.filter(['X','Y'], axis=1)
+
+        # Convert the coordinates to a list of tuples and multiply each by 100
+        tuples_list = [(int((row['X']*self.macro_functions.pixels)/self.macro_functions.scale), int((row['Y']*self.macro_functions.pixels)/self.macro_functions.scale)) for index, row in coordinates.iterrows()]
+
+
+        radius = 10
+        
+        # Blue color in BGR 
+        color = (0, 0, 255) 
+
+        # Line thickness of 2 px 
+        thickness = -1
+
+        for coordinate in tuples_list: 
+            cv2.circle(img, coordinate, radius, color, thickness)
+
+        cv2.imwrite(self.macro_functions.output_path, img)
+        
+
+
+
+
+
+        
+
+
+
+
+
 
 
         

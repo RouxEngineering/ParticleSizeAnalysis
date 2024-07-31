@@ -26,8 +26,6 @@ def read_imagefiles(image_directory):
     return list_of_imagepaths
 
 
-
-
 def main():
 
     # initalize image
@@ -35,6 +33,11 @@ def main():
 
     # initialize application
     app = PyImageJApp()
+
+    # prompt users for directories 
+    image_directory = str(input("Please enter the image directory path:"))
+    results_directory = str(input("Please enter your results directory path:"))
+    output_directory = str(input("Please enter your output direcyory path:"))
 
     # set directories
     image_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Particle Images/'
@@ -61,6 +64,7 @@ def main():
 
             # set scale and threshold if requested
             app.initialize_threshold_scale(operations)
+            app.analyze_particles_parameters(operations)
             
             # apply macro to every single image in folder
             for image_path in list_of_imagepaths:
@@ -76,11 +80,16 @@ def main():
                     threshold_max=app.macro_functions.threshold_max,
                     scale=app.macro_functions.scale,
                     unit=app.macro_functions.unit,
-                    pixels=app.macro_functions.pixels
+                    pixels=app.macro_functions.pixels,
+                    particle_size_min=app.macro_functions.particle_size_min,
+                    circularity_min=app.macro_functions.circularity_min
                 )
 
                 macro = app.running_macros(operations)
                 ij.py.run_macro(macro)
+
+                # label particles and update png
+                app.label_particles()
 
 
 if __name__ == '__main__':

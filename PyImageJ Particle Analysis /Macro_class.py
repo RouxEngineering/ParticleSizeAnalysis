@@ -2,7 +2,7 @@
 Macro functions to be called in PyImageJ
 '''
 class MacroFunctions:
-    def __init__(self, image_path=None, results_path=None, output_path=None, threshold_min=None, threshold_max=None, scale=None, unit=None, pixels=None):
+    def __init__(self, image_path=None, results_path=None, output_path=None, threshold_min=None, threshold_max=None, scale=None, unit=None, pixels=None, particle_size_min=None, particle_size_max='Infinity', circularity_min=None, circularity_max=None):
         #initalize variables 
         self.image_path = image_path
         self.results_path = results_path
@@ -12,6 +12,10 @@ class MacroFunctions:
         self.scale = scale
         self.unit  = unit
         self.pixels = pixels
+        self.particle_size_min = particle_size_min
+        self.particle_size_max = particle_size_max
+        self.circularity_max = circularity_max
+        self.circularity_min = circularity_min
 
     def open_image(self): 
         '''macro function to open image based on image file path'''
@@ -35,7 +39,8 @@ class MacroFunctions:
         '''macro function to apply binary mask onto image'''
         binary_mask = f'''
         run("Invert");
-        run("Convert to Mask");'''
+        run("Convert to Mask");
+        run("Watershed");'''
 
         return binary_mask
     
@@ -54,7 +59,7 @@ class MacroFunctions:
     
     def analyze_particles(self):
         '''macro function to analyze particles'''
-        analyze_particles = f'''run("Analyze Particles...","size=0-Infinity");'''
+        analyze_particles = f'''run("Analyze Particles...","size={self.particle_size_min}-{self.particle_size_max}, circularity={self.circularity_min}-{self.circularity_max}, exclude");'''
 
         return analyze_particles
     

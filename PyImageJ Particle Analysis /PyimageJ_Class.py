@@ -158,7 +158,7 @@ class PyImageJApp:
         macro_script = "\n".join(macro_cmd)
         return macro_script
     
-    def label_particles(self): 
+    def label_particles(self, operations): 
         '''create function to label particles on each image based on the x,y coordinates and update image'''
 
         img = cv2.imread(self.macro_functions.output_path)
@@ -169,16 +169,17 @@ class PyImageJApp:
         # create list of tuples 
         coordinates = particle_analysis_df.filter(['X','Y'], axis=1)
 
-        # Convert the coordinates to a list of tuples and multiply each by 100
-        tuples_list = [(int((row['X']*self.macro_functions.pixels)/self.macro_functions.scale), int((row['Y']*self.macro_functions.pixels)/self.macro_functions.scale)) for index, row in coordinates.iterrows()]
+        # convert to list of tuples
+        if 4 in operations:
+            tuples_list = [(int((row['X']*self.macro_functions.pixels)/self.macro_functions.scale), int((row['Y']*self.macro_functions.pixels)/self.macro_functions.scale)) for index, row in coordinates.iterrows()]
+        else:
+            tuples_list = [(int(row['X']), int(row['Y'])) for index, row in coordinates.iterrows()]
 
 
+
+        # centroid parameters
         radius = 10
-        
-        # Blue color in BGR 
         color = (0, 0, 255) 
-
-        # Line thickness of 2 px 
         thickness = -1
 
         for coordinate in tuples_list: 

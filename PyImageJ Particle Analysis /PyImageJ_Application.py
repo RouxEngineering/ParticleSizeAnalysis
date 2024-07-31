@@ -35,14 +35,9 @@ def main():
     app = PyImageJApp()
 
     # prompt users for directories 
-    image_directory = str(input("Please enter the image directory path:"))
-    results_directory = str(input("Please enter your results directory path:"))
-    output_directory = str(input("Please enter your output direcyory path:"))
-
-    # set directories
-    image_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Particle Images/'
-    results_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Results/'
-    output_directory = '/Users/sarah/Documents/areospace research/material recycling project/PyImageJ-Particle-Analysis/Processed Images/'
+    image_directory = str(input("Please enter the image directory path:"))+'/'
+    results_directory = str(input("Please enter your results directory path:"))+'/'
+    output_directory = str(input("Please enter your output directory path:"))+'/'
 
     list_of_imagepaths = read_imagefiles(image_directory)
 
@@ -89,7 +84,7 @@ def main():
                 ij.py.run_macro(macro)
 
                 # label particles and update png
-                app.label_particles()
+                app.label_particles(operations)
 
 
 if __name__ == '__main__':

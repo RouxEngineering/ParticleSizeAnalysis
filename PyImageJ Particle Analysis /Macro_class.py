@@ -59,7 +59,7 @@ class MacroFunctions:
     
     def analyze_particles(self):
         '''macro function to analyze particles'''
-        analyze_particles = f'''run("Analyze Particles...","size={self.particle_size_min}-{self.particle_size_max}, circularity={self.circularity_min}-{self.circularity_max}, exclude");'''
+        analyze_particles = f'''run("Analyze Particles...","size={self.particle_size_min}-{self.particle_size_max} clear summarize, circularity={self.circularity_min}-{self.circularity_max}, exclude");'''
 
         return analyze_particles
     

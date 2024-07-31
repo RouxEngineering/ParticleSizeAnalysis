@@ -66,3 +66,5 @@ class MacroFunctions:
     def save_type(self, save_type, save_path):
         '''sunction to save results or preprocessed image'''
         return f'''saveAs("{save_type}", "{save_path}");'''
+    
+  

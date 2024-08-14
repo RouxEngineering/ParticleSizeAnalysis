@@ -25,8 +25,8 @@ def compute_cumulative_freqency( df, target_column ):
     try:
         df[str(target_column)]
     except KeyError:                                    # handle KeyError
-        print(f'''KeyError value error. 
-target column, {target_column}, DOESN'T exist.\n''')
+        print(f'''A KeyError has occured: {KeyError}. 
+Target column, {target_column}, DOESN'T exist.\n''')
     else:                                               # No error, code block
         print('''Target column exist.\n''')
 

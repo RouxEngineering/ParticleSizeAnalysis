@@ -39,8 +39,8 @@ def add_eff_diameter( df, unit="pixels"):
         output_dataframe["File_key"] = data["File_key"]
     
     except KeyError:                                    # handle KeyError
-        print('''KeyError value error excepted.
-The input dataframe consist of one file.''')
+        print(f'''A KeyError has occured: {KeyError}. 
+The input dataframe consist of one file.\n''')
     
     else:                                               # No error, code block
         print('''Multiple files are in this input dataframe,

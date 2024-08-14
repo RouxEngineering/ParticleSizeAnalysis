@@ -1,9 +1,12 @@
 '''                                                    '''
 '''Program cum_relative_frequency                      '''
 '''                                                    '''
-'''This program comuptes the cumulative percentage
-    for a given Independent Variable for a pandas 
-    dataframe object.                                  '''
+'''This file used the method of finding the frequency
+of each (diameter) outcome in the input pandas dataframe
+It returns a pandas dataframe that contains 
+Area, effective radius, effective diameter, 
+cumulative freqeuncy, cumulative percentage, 
+and optionally [File_key].                             '''
 
 # Import statements
 import pandas as pd       # Required for dataframe
@@ -15,12 +18,13 @@ def cum_relative_freq(input_dataframe):
 
     data = input_dataframe
    
-    # Create a new dataframe, Raidus & Area Column
+    # Create a new dataframe
     output_dataframe = pd.DataFrame(
         { 
-        "Area": data["Area"],
-        # A = PI * r^2; r = (A/PI) ^2 (this is great but I think the formula for r should be r = sqrt(A/PI). The sqrt is already from the math library)
-        "eff_radius": (data["Area"]/math.pi)**0.5
+        "Area": data["Area"],                     # Extract Area
+        "Perim.": data["Perim."],                 # Extract Perimeter   
+        "eff_radius": (data["Area"]/math.pi)**0.5 # Compute Radius,
+        #   r = (A/PI) ^2 
         }) 
     
     #Create Diameter Column

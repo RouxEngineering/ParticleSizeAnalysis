@@ -15,14 +15,21 @@ import numpy as np
 def compute_sphericity( df ):
 
     # Convert Pandas Series to Numpy Array
-    Area = np.array( df.filter(like="Area") )      # Area
-    Perim = np.array( df.filter(like= "Perim") )  # real Perimeter
+    Area = np.array( df.filter(like="Area") )    # Area
+    Perim = np.array( df.filter(like= "Perim") ) # real  Perimeter column vector
+    Perim = Perim.reshape(-1)            # Converts to row vector: (n, 1) to (n,)
 
+    # if multiple area col exist, select the first
+    if Area.shape[-1] > 1:                
+        Area = np.array( Area[:,0] )    # (n,)
+    
     # Compute the perimeter of an equivalent circle
     eff_Perim = 2*np.sqrt(np.pi*Area) 
-    
+
+
     # Compute a Sphericity (ratio)
-    sphericity = eff_Perim/Perim                
+    sphericity = np.divide( eff_Perim, Perim )               
+    
 
     return sphericity
 

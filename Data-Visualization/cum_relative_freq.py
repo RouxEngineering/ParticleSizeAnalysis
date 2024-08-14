@@ -19,7 +19,7 @@ def cum_relative_freq(input_dataframe):
     output_dataframe = pd.DataFrame(
         { 
         "Area": data["Area"],
-        # A = PI * r^2; r = (A/PI) ^2 
+        # A = PI * r^2; r = (A/PI) ^2 (this is great but I think the formula for r should be r = sqrt(A/PI). The sqrt is already from the math library)
         "eff_radius": (data["Area"]/math.pi)**0.5
         }) 
     

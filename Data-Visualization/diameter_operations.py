@@ -11,25 +11,35 @@ Area, Perim,effective radius, effective diameter                          '''
 import pandas as pd       # Required for dataframe
 import numpy as np        # Required for math operations, contants
 
-def compute_eff_diameter(df):
+def compute_eff_diameter(df, area_column_name="Area"):
 
     data = df
-
+    
     # Compute Radius, r = (A/PI) ^ 0.5
-    effective_radius = (np.array(data["Area"])/np.pi)**0.5
-    effective_diameter = effective_radius*2             # Compute Radius,
-    return effective_diameter
+    try:
+        effective_radius = (np.array( data[area_column_name] )/np.pi)**0.5
+    except KeyError:
+        print(f'''A KeyError has occured: {KeyError}. 
+The input dataframe has not column called {area_column_name}.\n''')
+    else:
+        effective_diameter = effective_radius*2             # Compute Radius,
+        # print("eff diameter \n", effective_diameter, "\n", effective_diameter.shape )
+        # print("eff radius \n", effective_diameter/2, "\b", (effective_diameter/2).shape)
+        # print(" Target area column: ", data[area_column])
+        return effective_diameter
+    
+    
 
-def add_eff_diameter( df, unit="pixels"):
+def add_eff_diameter( df, area_column_name, perimeter_column_name, unit="pixels"):
 
-    diameter_array = compute_eff_diameter( df )
+    diameter_array = compute_eff_diameter( df, area_column_name )
     data = df
 
     # Create a new dataframe
     output_dataframe = pd.DataFrame(
         { 
-        f"Area_{unit}": data["Area"],                   # extract Area
-        f"Perim_{unit}": data["Perim."],                # extract Perimeter
+        f"Area_{unit}^2": data[ area_column_name ],            # extract Area
+        f"Perim_{unit}": df[perimeter_column_name],          # extract Perimeter
         f"eff_diameter_{unit}": diameter_array,         # add eff diameter  
         f"eff_radius_{unit}": diameter_array/2,         # add eff radius
         }) 

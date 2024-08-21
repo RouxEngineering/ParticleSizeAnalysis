@@ -1,0 +1,2 @@
+ ,Area,Mean,StdDev,Min,Max,X,Y,Perim.,BX,BY,Width,Height,Major,Minor,Angle,Circ.,Feret,IntDen,Median,Skew,Kurt,%Area,RawIntDen,Slice,FeretX,FeretY,FeretAngle,MinFeret,AR,Round,Solidity
+1,1733.333,255,0,255,255,30.712,30.461,156.529,8,8,45.333,48,47.919,46.056,76.118,0.889,51.502,442000,255,NaN,NaN,100,248625,1,19,42,68.749,45.333,1.040,0.961,0.957

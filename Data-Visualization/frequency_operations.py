@@ -21,7 +21,9 @@ import numpy as np        # Required for numpy arrays
 
 # 1. Calculate cumulative frequency for a given 
 # column (target_column)
-def compute_cumulative_freqency( df, target_column_name ):
+def compute_cumulative_freqency( DataFrame, target_column_name ):
+    df = DataFrame.copy() # Create a new Dataframe to avoid modifying input 
+
     try:
         df[str(target_column_name)]
     except KeyError:                                    # handle KeyError
@@ -76,15 +78,17 @@ Target column, {target_column_name}, DOESN'T exist.\n''')
         else:                            # else the list must be empty 
             cumulative_frequency.append(freq[j])
     
-    return cumulative_frequency, total_elements  # output a tuple 
+    return df, cumulative_frequency, total_elements  # Return the modified DataFrame
 
 
 
 #2. Add the cumulative frequency to dataframe 
-def add_cumulative_frequency(df, target_column_name, suffix ):
+def add_cumulative_frequency( DataFrame, target_column_name, suffix ):
     # Add the cumulative frequency column to dataframe
-    cum_freq, total_elements = compute_cumulative_freqency( df, target_column_name )
-    df[f"cumulative_frequency_{suffix}"] = cum_freq
+    df, cum_freq, total_elements = compute_cumulative_freqency( DataFrame, target_column_name )
+
+    if df is not None:  # Ensure the dataframe is value 
+        df[f"cumulative frequency {suffix}"] = cum_freq
 
     return df
 
@@ -93,10 +97,10 @@ def add_cumulative_frequency(df, target_column_name, suffix ):
 
 # 3. Compute cumulative percentage for each particle, 
 #       Accounting for repeats
-def compute_cumulative_percentage(df, target_column_name):
-
+def compute_cumulative_percentage( DataFrame, target_column_name):
+    df = DataFrame
     # Grab cumulative frequency (array) and total particle (int)
-    cumulative_freq, total_particles = compute_cumulative_freqency(df, 
+    df, cumulative_freq, total_particles = compute_cumulative_freqency( df, 
                                                             target_column_name)
     cumulative_percentage = (np.array(cumulative_freq)/total_particles)*100
     
@@ -108,11 +112,11 @@ def compute_cumulative_percentage(df, target_column_name):
 
 
 # 4. Add cumulative percentage to dataframe
-def add_cumulative_percentage(df, target_column_name, column_suffix ): 
-
+def add_cumulative_percentage(DataFrame, target_column_name, column_suffix ): 
+    df =DataFrame
     # Add cumulative percentage array to input dataframe
     cum_per = compute_cumulative_percentage( df, target_column_name )
-    df[f"cumulative_%_particle_{column_suffix}"] = cum_per  
+    df[f"cumulative_%_particle {column_suffix}"] = cum_per  
 
     return df
 

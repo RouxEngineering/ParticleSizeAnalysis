@@ -23,7 +23,7 @@ import numpy as np        # Required for numpy arrays
 # column (target_column)
 def compute_cumulative_freqency( DataFrame, target_column_name ):
     df = DataFrame.copy() # Create a new Dataframe to avoid modifying input 
-
+    
     try:
         df[str(target_column_name)]
     except KeyError:                                    # handle KeyError
@@ -32,7 +32,7 @@ Target column, {target_column_name}, DOESN'T exist.\n''')
     else:                                               # No error, code block
         print('''Target column exist.\n''')
 
-    # Sort the input dataframe passed into the function asending order 
+    # Sort the input dataframe passed into the function asending order ( modify in place)
     df.sort_values( by=str(target_column_name), inplace=True) 
 
     # Create a list of sorted values 

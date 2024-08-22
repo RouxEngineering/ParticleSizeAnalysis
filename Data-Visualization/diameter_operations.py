@@ -57,4 +57,28 @@ The input dataframe consist of one file.\n''')
 File_key column ADDED.''')
         
     return output_dataframe
+     
         
+
+# Add all appropriate columns related to diameter metrics to dataframe 
+def build_diameter_metrics_dataframe( input_dataframe, area_col_name, perimeter_col_name, target_col_name, suf, FlowCam = True):
+    from frequency_operations import add_cumulative_frequency, add_cumulative_percentage
+    if not FlowCam: # if dataframe is not flowcam (default to true), add effective diameter column (modify in place)
+        input_dataframe = add_eff_diameter( 
+                                df=input_dataframe, 
+                                area_column_name=area_col_name, 
+                                perimeter_column_name=perimeter_col_name
+                                          )
+    # Add dataframe cumulative frequency column ( copy )
+    new_df = add_cumulative_frequency(
+                    DataFrame= input_dataframe,
+                    target_column_name= target_col_name,
+                    suffix = suf
+                    )
+    
+    new_df = add_cumulative_percentage( 
+        DataFrame= new_df, # target database
+        target_column_name= target_col_name,
+        column_suffix= suf,
+    )
+    return new_df

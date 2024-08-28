@@ -115,7 +115,7 @@ def prompt_user():
         # prompt users for directories 
         image_directory = input("Please enter the image directory path: ")
         results_directory = input("Please enter your results directory path: ")
-        output_directory = input("Please enter your output directory path: ")
+        output_directory = input("Please enter your processed images directory path: ")
 
         list_of_imagepaths = read_imagefiles(image_directory)
 
@@ -140,11 +140,15 @@ def concatenate_csv_files(input_folder):
 
 def main():
       
-      prompt_user()
+    prompt_user()
 
-      csv_folder = input('enter directory folder of results to be concatenated:')
-      concatenate_csv_files(input_folder=csv_folder)
-    
+    confirmation = input('Do you want to concatenate the CSV files in this folder? (yes/no): ')
+    if confirmation.lower() == 'yes':
+        csv_folder = input('Enter the directory folder of results to be concatenated: ')
+        concatenate_csv_files(input_folder=csv_folder)
+    else:
+        print("Concatenation process was cancelled by the user.")
+
 
 if __name__ == '__main__':
     main()

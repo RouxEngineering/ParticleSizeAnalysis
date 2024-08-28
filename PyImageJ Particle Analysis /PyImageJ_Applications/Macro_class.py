@@ -31,15 +31,18 @@ class MacroFunctions:
     
     def set_threshold(self):
         '''function to return macto for threshold based on user input'''
-        macro_threshold = f'''setThreshold({self.threshold_min}, 255);
-        run("Invert");'''
+        macro_threshold = f'''
+        setThreshold({self.threshold_min}, 255);
+        '''
 
         return macro_threshold
     
     def binary_mask(self):
         '''macro function to apply binary mask onto image'''
         binary_mask = f'''
-        run("Convert to Mask");'''
+        setOption("BlackBackground", true);
+        run("Make Binary");
+        run("Watershed")'''
 
         return binary_mask
     

@@ -41,7 +41,7 @@ class PyImageJApp:
         '''function to open interactive Threshold GUI for user to set image Threshold, as user for threshold value'''
 
         # read image into opencv in grayscale
-        image = cv2.imread(self.macro_functions.image_path)
+        image = cv2.imread(self.macro_functions.image_path, cv2.IMREAD_GRAYSCALE)
 
         # create plot for threshold and to display image
         fig, ax = plt.subplots()
@@ -71,6 +71,7 @@ class PyImageJApp:
         plt.show()
 
         threshold = int(input('Please Type your Threshold Value:'))
+
         return threshold
 
     def prompt_user(self):
@@ -171,9 +172,7 @@ class PyImageJApp:
             tuples_list = [(int((row['X']*self.macro_functions.pixels)/self.macro_functions.scale), int((row['Y']*self.macro_functions.pixels)/self.macro_functions.scale)) for index, row in coordinates.iterrows()]
         else:
             tuples_list = [(int(row['X']), int(row['Y'])) for index, row in coordinates.iterrows()]
-
-
-
+            
         # centroid parameters
         radius = 10
         color = (0, 0, 255) 

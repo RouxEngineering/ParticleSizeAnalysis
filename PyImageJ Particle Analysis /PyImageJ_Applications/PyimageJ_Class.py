@@ -71,7 +71,6 @@ class PyImageJApp:
         plt.show()
 
         threshold = int(input('Please Type your Threshold Value:'))
-
         return threshold
 
     def prompt_user(self):

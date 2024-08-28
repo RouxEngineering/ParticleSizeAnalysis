@@ -42,6 +42,7 @@ class MacroFunctions:
         binary_mask = f'''
         setOption("BlackBackground", true);
         run("Make Binary");
+        run("Invert"); // comment out based on what the image is 
         run("Watershed")'''
 
         return binary_mask

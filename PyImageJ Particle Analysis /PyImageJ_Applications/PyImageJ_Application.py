@@ -8,22 +8,22 @@ from Macro_class import MacroFunctions
 import os
 import glob
 import pandas as pd
+from PIL import Image
 
 
 def read_imagefiles(image_directory):
-    '''function to iteratively get the paths for every image in the particle image path returns list of image paths to be opened
+    '''function to iteratively get the paths for every image in the particle image path returns list of image paths to be opened and convert them to png if not already png files
     args:
     image_directory = folder path for images
     
     return:
     list_of_imagepaths = list of image paths for each image in folder'''
-    
+
     list_of_imagepaths = []
 
-    # iterate over image_directory
-    for image in os.listdir(image_directory):
-        list_of_imagepaths.append(image)
-
+    for filename in os.listdir(image_directory):
+        list_of_imagepaths.append(filename)
+    
     list_of_imagepaths.sort()
 
     return list_of_imagepaths
@@ -50,33 +50,31 @@ def concat_csvfiles(results_directory):
     # Save the concatenated dataframe to a new CSV file
     df_out.to_csv(os.path.join(path, f'{csv_name}.csv'), index=False)
 
-def run_app(image_directory, app, list_of_imagepaths, results_directory, output_directory, ij):
+def run_app(scale_directory, image_directory, app, list_of_imagepaths, results_directory, output_directory, ij):
     '''function to run application based on user directory inputs'''
     if list_of_imagepaths:
         
         # initialize threshold and scale using scale png
-        for image_path in list_of_imagepaths:
-            if 'scale.png' in image_path:
-                scale_image_path = image_path
-                absolute_image_path = os.path.join(image_directory, scale_image_path)
-                absolute_results_path = os.path.splitext(os.path.join(results_directory, scale_image_path))[0] + '_results.csv'
-                absolute_output_path = os.path.splitext(os.path.join(output_directory, scale_image_path))[0] + '_processedimage.png'
+        if scale_directory:
+            absolute_image_path = os.path.join(image_directory, scale_directory)
+            absolute_results_path = os.path.splitext(os.path.join(results_directory, scale_directory))[0] + '_results.csv'
+            absolute_output_path = os.path.splitext(os.path.join(output_directory, scale_directory))[0] + '_processedimage.png'
 
-                app.macro_functions = MacroFunctions(
-                    image_path=absolute_image_path,
-                    results_path=absolute_results_path,
-                    output_path=absolute_output_path,
-                )
+            app.macro_functions = MacroFunctions(
+                image_path=absolute_image_path,
+                results_path=absolute_results_path,
+                output_path=absolute_output_path,
+            )
         # prompt user for operation inputs 
         operations = app.prompt_user()
 
         # set scale and threshold if requested
-        app.initialize_threshold_scale(operations)
+        app.initialize_threshold_scale(operations, image_directory)
         app.analyze_particles_parameters(operations)
         
         # apply macro to every single image in folder
         for image_path in list_of_imagepaths:
-            if os.path.basename(image_path).lower() == 'scale.png' or not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):
+            if os.path.basename(image_path).lower() == 'scale.png' or not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 continue
             absolute_image_path = os.path.join(image_directory, image_path)
             absolute_results_path = os.path.splitext(os.path.join(results_directory, image_path))[0] + '_results.csv'
@@ -102,29 +100,24 @@ def run_app(image_directory, app, list_of_imagepaths, results_directory, output_
             app.label_particles(operations)
 
 def prompt_user():
-    '''function to prompt users if they want to run the application and get their inputs'''
+    '''prompt user for inputs for running PyImageJ Application'''
 
-    user_input = input('Do you want to run the PyImageJ application? (yes/no): ')
+    ij = imagej.init('net.imagej:imagej+net.imagej:imagej-legacy', mode=Mode.HEADLESS)
 
-    if user_input.lower() == 'yes':
-        ij = imagej.init('net.imagej:imagej+net.imagej:imagej-legacy', mode=Mode.HEADLESS)
+    # initialize application
+    app = PyImageJApp()
 
-        # initialize application
-        app = PyImageJApp()
+    # prompt users for directories 
+    image_directory = input("Please enter the image directory path: ")
+    results_directory = input("Please enter your results directory path: ")
+    output_directory = input("Please enter your processed images directory path: ")
+    scale_directory = input("Please enter your scale directory path: ")
 
-        # prompt users for directories 
-        image_directory = input("Please enter the image directory path: ")
-        results_directory = input("Please enter your results directory path: ")
-        output_directory = input("Please enter your processed images directory path: ")
+    list_of_imagepaths = read_imagefiles(image_directory)
 
-        list_of_imagepaths = read_imagefiles(image_directory)
-
-        run_app(image_directory, app, list_of_imagepaths, results_directory, output_directory, ij)
-        
-        return True
-    else: 
-        return False
+    run_app(scale_directory, image_directory, app, list_of_imagepaths, results_directory, output_directory, ij)
     
+
 
 def concatenate_csv_files(input_folder):
     '''function to concatenate all csv files in one folder into one csv '''

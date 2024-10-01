@@ -12,6 +12,15 @@ class PyImageJApp:
     def __init__(self):
         self.macro_functions = None
 
+    def get_first_image(self, image_directory):
+        '''Helper function to return the first valid image file from a directory'''
+        valid_extensions = ('.png', '.jpg', '.jpeg', '.tif')
+        
+        for filename in os.listdir(image_directory):
+            if filename.lower() != 'scale.png' and filename.lower().endswith(valid_extensions):
+                return os.path.join(image_directory, filename)
+
+
     def get_scale(self): 
         '''function to open OpenCV GUI to allow user to set scale values for ImageJ'''
 
@@ -37,11 +46,12 @@ class PyImageJApp:
 
         return  scale_in_pixels
     
-    def get_threshold(self):
+    def get_threshold(self, image_directory):
         '''function to open interactive Threshold GUI for user to set image Threshold, as user for threshold value'''
+        image_path = self.get_first_image(image_directory)
 
         # read image into opencv in grayscale
-        image = cv2.imread(self.macro_functions.image_path, cv2.IMREAD_GRAYSCALE)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
         # create plot for threshold and to display image
         fig, ax = plt.subplots()
@@ -98,11 +108,11 @@ class PyImageJApp:
 
         return selected_operations
     
-    def initialize_threshold_scale(self, operations):
+    def initialize_threshold_scale(self, operations, image_directory):
         '''function to initalize threshold and scale values for one image'''
 
         if 2 in operations: 
-            self.macro_functions.threshold_min = int(self.get_threshold())
+            self.macro_functions.threshold_min = int(self.get_threshold(image_directory))
             self.macro_functions.threshold_max = 225 
 
         if 4 in operations: 

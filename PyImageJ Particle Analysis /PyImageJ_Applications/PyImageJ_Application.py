@@ -140,7 +140,7 @@ def concatenate_csv_files(input_folder):
 
 def main():
       
-    #prompt_user()
+    prompt_user()
 
     confirmation = input('Do you want to concatenate the CSV files in this folder? (yes/no): ')
     if confirmation.lower() == 'yes':

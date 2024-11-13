@@ -9,6 +9,7 @@ import os
 import glob
 import pandas as pd
 from PIL import Image
+from tkinter import filedialog 
 
 
 def read_imagefiles(image_directory):
@@ -108,10 +109,14 @@ def prompt_user():
     app = PyImageJApp()
 
     # prompt users for directories 
-    image_directory = input("Please enter the image directory path: ")
-    results_directory = input("Please enter your results directory path: ")
-    output_directory = input("Please enter your processed images directory path: ")
-    scale_directory = input("Please enter your scale directory path: ")
+    print("Please select the image folder:")
+    image_directory = filedialog.askdirectory()
+    print("Please select results folder to save csv files")
+    results_directory = filedialog.askdirectory() 
+    print("Please select the processed images folder")
+    output_directory = filedialog.askdirectory() 
+    print("Please select the image you will use as the scale")
+    scale_directory = filedialog.askopenfilename()
 
     list_of_imagepaths = read_imagefiles(image_directory)
 
@@ -137,10 +142,11 @@ def main():
 
     confirmation = input('Do you want to concatenate the CSV files in this folder? (yes/no): ')
     if confirmation.lower() == 'yes':
-        csv_folder = input('Enter the directory folder of results to be concatenated: ')
+        print('Please select the folder where you would like to concatenate the csv files')
+        csv_folder = filedialog.askdirectory() 
         concatenate_csv_files(input_folder=csv_folder)
     else:
-        print("Concatenation process was cancelled by the user.")
+        print("Concatenation process was cancelled.")
 
 
 if __name__ == '__main__':

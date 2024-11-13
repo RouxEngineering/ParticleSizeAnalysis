@@ -98,7 +98,6 @@ class PyImageJApp:
             6:'save'
 
         }
-
         selected_operations = []
 
         for key, operation in operation_dict.items():

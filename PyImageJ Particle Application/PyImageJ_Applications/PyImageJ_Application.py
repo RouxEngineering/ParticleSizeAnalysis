@@ -1,153 +1,139 @@
-'''
-PyImageJ Application
-'''
-import imagej
-from imagej import Mode
-from PyimageJ_Class import PyImageJApp
-from Macro_class import MacroFunctions
 import os
 import glob
 import pandas as pd
-from PIL import Image
-from tkinter import filedialog 
+from tkinter import filedialog
+from PyimageJ_Class import PyImageJApp
+from Macro_class import MacroFunctions
+import imagej
+from imagej import Mode
 
 
-def read_imagefiles(image_directory):
-    '''function to iteratively get the paths for every image in the particle image path returns list of image paths to be opened and convert them to png if not already png files
-    args:
-    image_directory = folder path for images
-    
-    return:
-    list_of_imagepaths = list of image paths for each image in folder'''
+class PyImageJApplication:
+    def __init__(self):
+        """initalizing PyimageJ application"""
+        self.ij = imagej.init('net.imagej:imagej+net.imagej:imagej-legacy', mode=Mode.HEADLESS)
+        self.app = PyImageJApp()
 
-    list_of_imagepaths = []
+    @staticmethod
+    def read_imagefiles(image_directory):
+        """get image paths of all images from a folder
+        arg: 
+        image_directory (str): folder path containing imagees
 
-    for filename in os.listdir(image_directory):
-        list_of_imagepaths.append(filename)
-    
-    list_of_imagepaths.sort()
+        return:
+        list: list of image file paths
+        """
+        return sorted([filename for filename in os.listdir(image_directory)])
 
-    return list_of_imagepaths
+    @staticmethod
+    def concatenate_csv_files(input_folder, output_filename='concatenated_file.csv'):
+        """concatenate csv files into one csv
 
-def concat_csvfiles(results_directory):
-    '''function that asks user to select a directory and concat the csv files in a directory into one csv'''
-    csv_name = input('Input concatenated CSV file name:')
-    path = results_directory
+        Args:
+            input_folder (str):directory of folders with .csv files
+            output_filename (str): name of concatenated file 
+        """
+        combined_df = pd.concat(
+            [pd.read_csv(os.path.join(input_folder, f)) for f in os.listdir(input_folder) if f.endswith('.csv')],
+            ignore_index=True
+        )
+        output_file_path = os.path.join(input_folder, output_filename)
+        combined_df.to_csv(output_file_path, index=False)
 
-    # Get all CSV files in the directory
-    files = glob.glob(os.path.join(path, "*.csv"))
+    def run_app(self, scale_directory, image_directory, list_of_imagepaths, results_directory, output_directory):
+        """run image processing application."""
+        if list_of_imagepaths:
+            # Initialize threshold and scale using scale image
+            if scale_directory:
+                absolute_image_path = os.path.join(image_directory, scale_directory)
+                absolute_results_path = os.path.splitext(os.path.join(results_directory, scale_directory))[0] + '_results.csv'
+                absolute_output_path = os.path.splitext(os.path.join(output_directory, scale_directory))[0] + '_processedimage.png'
 
-    # Initialize an empty list to hold the dataframes
-    flist = []
+                self.app.macro_functions = MacroFunctions(
+                    image_path=absolute_image_path,
+                    results_path=absolute_results_path,
+                    output_path=absolute_output_path,
+                )
 
-    # Loop through the files and read them into dataframes
-    for filename in files:
-        df = pd.read_csv(filename, index_col=False)
-        flist.append(df)
+            # Prompt user for operations
+            operations = self.app.prompt_user()
 
-    # Concatenate all dataframes into one
-    df_out = pd.concat(flist, axis=0, ignore_index=True)
+            # Set scale and threshold if requested
+            self.app.initialize_threshold_scale(operations, image_directory)
+            self.app.analyze_particles_parameters(operations)
 
-    # Save the concatenated dataframe to a new CSV file
-    df_out.to_csv(os.path.join(path, f'{csv_name}.csv'), index=False)
+            # Apply macro to every single image in the folder
+            for image_path in list_of_imagepaths:
+                if os.path.basename(image_path).lower() == 'scale.png' or not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                    continue
 
-def run_app(scale_directory, image_directory, app, list_of_imagepaths, results_directory, output_directory, ij):
-    '''function to run application based on user directory inputs'''
-    if list_of_imagepaths:
-        
-        # initialize threshold and scale using scale png
-        if scale_directory:
-            absolute_image_path = os.path.join(image_directory, scale_directory)
-            absolute_results_path = os.path.splitext(os.path.join(results_directory, scale_directory))[0] + '_results.csv'
-            absolute_output_path = os.path.splitext(os.path.join(output_directory, scale_directory))[0] + '_processedimage.png'
+                absolute_image_path = os.path.join(image_directory, image_path)
+                absolute_results_path = os.path.splitext(os.path.join(results_directory, image_path))[0] + '_results.csv'
+                absolute_output_path = os.path.splitext(os.path.join(output_directory, image_path))[0] + '_processedimage.png'
 
-            app.macro_functions = MacroFunctions(
-                image_path=absolute_image_path,
-                results_path=absolute_results_path,
-                output_path=absolute_output_path,
-            )
-        # prompt user for operation inputs 
-        operations = app.prompt_user()
+                self.app.macro_functions = MacroFunctions(
+                    image_path=absolute_image_path,
+                    results_path=absolute_results_path,
+                    output_path=absolute_output_path,
+                    threshold_min=self.app.macro_functions.threshold_min,
+                    threshold_max=self.app.macro_functions.threshold_max,
+                    scale=self.app.macro_functions.scale,
+                    unit=self.app.macro_functions.unit,
+                    pixels=self.app.macro_functions.pixels,
+                    particle_size_min=self.app.macro_functions.particle_size_min,
+                    circularity_min=self.app.macro_functions.circularity_min
+                )
 
-        # set scale and threshold if requested
-        app.initialize_threshold_scale(operations, image_directory)
-        app.analyze_particles_parameters(operations)
-        
-        # apply macro to every single image in folder
-        for image_path in list_of_imagepaths:
-            if os.path.basename(image_path).lower() == 'scale.png' or not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                continue
-            absolute_image_path = os.path.join(image_directory, image_path)
-            absolute_results_path = os.path.splitext(os.path.join(results_directory, image_path))[0] + '_results.csv'
-            absolute_output_path = os.path.splitext(os.path.join(output_directory, image_path))[0] + '_processedimage.png'
+                macro = self.app.running_macros(operations)
+                self.ij.py.run_macro(macro)
 
-            app.macro_functions = MacroFunctions(
-                image_path=absolute_image_path,
-                results_path=absolute_results_path,
-                output_path=absolute_output_path,
-                threshold_min=app.macro_functions.threshold_min,
-                threshold_max=app.macro_functions.threshold_max,
-                scale=app.macro_functions.scale,
-                unit=app.macro_functions.unit,
-                pixels=app.macro_functions.pixels,
-                particle_size_min=app.macro_functions.particle_size_min,
-                circularity_min=app.macro_functions.circularity_min
-            )
+                # Label particles and update PNG
+                self.app.label_particles(operations)
 
-            macro = app.running_macros(operations)
-            ij.py.run_macro(macro)
+    @staticmethod
+    def create_output_folders(image_directory):
+        """create folders to put results and processed images into
 
-            # label particles and update png
-            app.label_particles(operations)
+        Args:
+            image_directory (str): path to folder with images
 
-def prompt_user():
-    '''prompt user for inputs for running PyImageJ Application'''
+        Returns:
+            tuple: path to the results folder and processed images folder
+        """
+        results_folder = os.path.join(image_directory, "results")
+        processed_images_folder = os.path.join(image_directory, "processed_images")
 
-    ij = imagej.init('net.imagej:imagej+net.imagej:imagej-legacy', mode=Mode.HEADLESS)
+        os.makedirs(results_folder, exist_ok=True)
+        os.makedirs(processed_images_folder, exist_ok=True)
 
-    # initialize application
-    app = PyImageJApp()
+        return results_folder, processed_images_folder
 
-    # prompt users for directories 
-    print("Please select the image folder:")
-    image_directory = filedialog.askdirectory()
-    print("Please select results folder to save csv files")
-    results_directory = filedialog.askdirectory() 
-    print("Please select the processed images folder")
-    output_directory = filedialog.askdirectory() 
-    print("Please select the image you will use as the scale")
-    scale_directory = filedialog.askopenfilename()
+    def run_with_auto_folders(self):
+        """run application with folders created"""
+        print("Please select the folder containing images:")
+        image_directory = filedialog.askdirectory()
 
-    list_of_imagepaths = read_imagefiles(image_directory)
+        # create output folders
+        results_folder, processed_images_folder = self.create_output_folders(image_directory)
 
-    run_app(scale_directory, image_directory, app, list_of_imagepaths, results_directory, output_directory, ij)
-    
+        # Select the scale image
+        print("Please select the image you will use as the scale:")
+        scale_directory = filedialog.askopenfilename()
 
+        list_of_imagepaths = self.read_imagefiles(image_directory)
+        self.run_app(scale_directory, image_directory, list_of_imagepaths, results_folder, processed_images_folder)
 
-def concatenate_csv_files(input_folder):
-    '''function to concatenate all csv files in one folder into one csv '''
+        confirmation = input("do you want to concatenate all CSV files in the results folder? (yes/no): ").strip().lower()
+        if confirmation == "yes":
+            self.concatenate_csv_files(results_folder)
+        else:
+            print("CSV concatenation terminated.")
 
-    combined_df = pd.concat(
-        [pd.read_csv(os.path.join(input_folder, f)) for f in os.listdir(input_folder) if f.endswith('.csv')],
-        ignore_index=True
-    )
-
-    output_file_path = os.path.join(input_folder, 'concatenated_output.csv')
-
-    combined_df.to_csv(output_file_path, index=False)
-
-def main():
-      
-    prompt_user()
-
-    confirmation = input('Do you want to concatenate the CSV files in this folder? (yes/no): ')
-    if confirmation.lower() == 'yes':
-        print('Please select the folder where you would like to concatenate the csv files')
-        csv_folder = filedialog.askdirectory() 
-        concatenate_csv_files(input_folder=csv_folder)
-    else:
-        print("Concatenation process was cancelled.")
+    def main(self):
+        """run application"""
+        self.run_with_auto_folders()
 
 
 if __name__ == '__main__':
-    main()
+    app = PyImageJApplication()
+    app.main()

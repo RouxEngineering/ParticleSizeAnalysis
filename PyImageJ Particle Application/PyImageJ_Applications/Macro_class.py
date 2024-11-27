@@ -43,7 +43,7 @@ class MacroFunctions:
         setOption("BlackBackground", true);
         run("Make Binary");
         run("Invert"); // comment out based on what the image is 
-        run("Adjustable Watershed", "tolerance=0.3");'''
+        run("Watershed");'''
 
         return binary_mask
     

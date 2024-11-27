@@ -43,7 +43,7 @@ class MacroFunctions:
         setOption("BlackBackground", true);
         run("Make Binary");
         run("Invert"); // comment out based on what the image is 
-        run("Watershed")'''
+        run("Adjustable Watershed", "tolerance=0.3");'''
 
         return binary_mask
     
@@ -67,7 +67,7 @@ class MacroFunctions:
         return analyze_particles
     
     def save_type(self, save_type, save_path):
-        '''sunction to save results or preprocessed image'''
+        '''function to save results or preprocessed image'''
         return f'''saveAs("{save_type}", "{save_path}");'''
     
   

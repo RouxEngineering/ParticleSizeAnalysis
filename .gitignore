@@ -1,0 +1,23 @@
+# Ignore MacOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Ignore Windows specific files 
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Other ignore statements
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+

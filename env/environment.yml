@@ -1,0 +1,24 @@
+name: pyimagej-flowcam-visualization
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - conda-forge::pyimagej
+  - seaborn
+  - ipykernel
+  - plotly=5.23.0
+  - ipywidgets
+  - tabula-py
+  - pdfplumber
+  - pytesseract
+  - tesseract
+  - regex
+  - pillow
+  - pdf2image
+  - python-kaleido
+  - openpyxl
+  - adjusttext
+  - pip
+  - pip:
+      - -r env/requirements.txt  # Correct path to requirements.txt inside 'env' folder

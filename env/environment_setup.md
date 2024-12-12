@@ -13,7 +13,7 @@ Ensure that [Conda](https://docs.conda.io/en/latest/) is installed on your syste
    git clone <repository-url>
    cd <repository-folder>
 
-2. **Create a Conda Environement**: Use the provided `environment.yml` file to create a python environment with relavent dependencies.
+2. **Create a Conda Environement**: Use the provided `environment.yml` file to create a python environment with relavent dependencies from the repository root folder.
 
     ```bash
     conda env create -f env/environment.yml
@@ -22,3 +22,7 @@ Ensure that [Conda](https://docs.conda.io/en/latest/) is installed on your syste
     ```bash
     conda activate pyimagej-flowcam-visualization
     ```
+Note: Deactivate this environment when not in use using the following Terminal command:  
+```bash 
+conda deactivate
+```

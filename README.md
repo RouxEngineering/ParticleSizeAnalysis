@@ -1,3 +1,2 @@
-# PyImageJ Particle Analysis
-
-
+# ParticleSizeAnalysis
+Using PyImageJ
